@@ -1,5 +1,5 @@
 # Ideas para implementar
- * Estructura basica html
+ * Estructura basica html: doctype, html, head, title, body
  * SEO
  * css inutil
  * usode eval o innerHTML
