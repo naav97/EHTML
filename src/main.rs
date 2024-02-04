@@ -52,10 +52,21 @@ use std::fs;
 fn validate_html_structure(cont: &str) -> bool {
     let mut trimmed = cont.replace("\t", "");
     trimmed = trimmed.replace("\n", "");
+    trimmed = trimmed.replace("    ", "");
+    trimmed = trimmed.replace("   ", "");
     trimmed = trimmed.replace(">", ">`");
     trimmed = if trimmed.ends_with("`") { trimmed[..trimmed.len() - 1].to_string() } else { trimmed };
     let elemts: Vec<&str> = trimmed.split("`").collect();
     if !elemts[0].starts_with("<!DOCTYPE") {
+        println!("ERROR: Missing or misplaced DOCTYPE tag");
+        return false;
+    }
+    else if !elemts[1].starts_with("<html") {
+        println!("ERROR: Missing of misplaced html tag");
+        return false;
+    }
+    else if elemts[elemts.len()-1] != "</html>" {
+        println!("ERROR: Code outside of html tag scope");
         return false;
     }
     let mut i = 0;
