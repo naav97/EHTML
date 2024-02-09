@@ -1,10 +1,18 @@
-# Ideas para implementar
- * Estructura basica html: doctype, html, head, title, body
- * SEO
- * css inutil
- * usode eval o innerHTML
- * compilar jquery a js
- * variables
- * condicionales
- * loops
- * plantillas
+# EHTML
+
+EHTML is a html validator. (For now) It validates the basic structure (mening doctype, html, head, title and body tags in correct order) of an HTML file passed as an argument.
+
+## Runing
+
+`cargo run <html_file>`
+
+## ToDo
+- [x] Validate html structure (doctype, html, head, title, body) 
+- [ ] SEO tips
+- [ ] css optimization
+- [ ] check for bad practices like the use of eval or innetHTML
+- [ ] compile jquery to js
+- [ ] html simple variables
+- [ ] html simple conditional
+- [ ] html loop
+- [ ] tamplates
