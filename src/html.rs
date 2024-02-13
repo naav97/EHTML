@@ -27,9 +27,7 @@ pub fn find_meta_tag(tokens: &Vec<&str>) -> usize {
 }
 
 pub fn validate_html_structure(cont: &str) -> bool {
-    let mut trimmed = cont.replace("\t", "");
-    trimmed = trimmed.replace("\n", "");
-    trimmed = trimmed.replace("    ", "");
+    let mut trimmed = cont.replace("    ", "");
     trimmed = trimmed.replace("   ", "");
     trimmed = trimmed.replace(">", ">`");
     trimmed = trimmed.replace("</", "`</");
