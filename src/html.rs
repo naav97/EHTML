@@ -11,6 +11,21 @@ pub fn get_element_pos(tokens: &Vec<&str>, element: &str) -> usize {
     return re;
 }
 
+pub fn find_meta_tag(tokens: &Vec<&str>) -> usize {
+    let mut re = 0;
+    let mut i = 0;
+    while i < tokens.len() {
+        if tokens[i].starts_with("<meta") {
+            if tokens[i].contains("name=\"description\"") || tokens[i].contains("name='description'") {
+                re = i;
+                break;
+            }
+        }
+        i = i + 1;
+    }
+    return re;
+}
+
 pub fn validate_html_structure(cont: &str) -> bool {
     let mut trimmed = cont.replace("\t", "");
     trimmed = trimmed.replace("\n", "");
@@ -51,6 +66,11 @@ pub fn validate_html_structure(cont: &str) -> bool {
     let pos_end_title = get_element_pos(&elemts, &"</title>");
     if !(pos_start_title > 2 && pos_start_title < pos_end_title) || !(pos_end_title < pos_end_head) {
         println!("ERROR: Missing or misplaced title tag, title tag scope null or outside of head tag scope");
+        return false;
+    }
+    let pos_meta_desc = find_meta_tag(&elemts);
+    if !(pos_meta_desc > 2 && pos_meta_desc < pos_end_head) {
+        println!("ERROR: Missing or misplaced description meta tag");
         return false;
     }
     let mut i = 0;
