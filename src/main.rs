@@ -2,7 +2,7 @@ mod html;
 use std::env;
 use std::fs;
 
-fn check_title_lenght(cont: &str) -> bool {
+fn check_title_length(cont: &str) -> bool {
     let mut trimmed = cont.replace("<title", "`<title");
     trimmed = trimmed.replace("</title>", "</title>`");
     let mut tokens: Vec<&str> = trimmed.split("`").collect();
@@ -16,15 +16,43 @@ fn check_title_lenght(cont: &str) -> bool {
     return tit_cont.chars().count() >= 50 && tit_cont.chars().count() <= 60;
 }
 
-fn check_seo(cont: &str) -> bool {
-    if !check_title_lenght(cont) {
-        println!("WARNING: title is to long or to short, or theres an error");
+fn check_desc_length(cont: &str) -> bool {
+    let mut trimmed = cont.replace("<meta", "`<meta");
+    trimmed = trimmed.replace(">", ">`");
+    let mut tokens: Vec<&str> = trimmed.split("`").collect();
+    tokens.retain(|&tok| tok.starts_with("<meta") && tok.contains("name=\"description\""));
+    if let Some(cont_pos) = tokens[0].find("content=") {
+        let init = cont_pos + "content=\"".len();
+        tokens[0] = &tokens[0][init..];
+        if let Some(end_pos) = tokens[0].find("\"") {
+            tokens[0] = &tokens[0][..end_pos];
+            return tokens[0].len() >= 150 && tokens[0].len() <= 160;
+        }
+        else {
+            println!("ERROR: something went wrong");
+            return false;
+        }
+    }
+    else {
+        println!("ERROR: missing content value in description meta tag");
         return false;
+    }
+}
+
+fn check_seo(cont: &str) -> bool {
+    let mut re: bool = true;
+    if !check_title_length(cont) {
+        println!("WARNING: title is to long or to short, or theres an error");
+        re = false;
+    }
+    if !check_desc_length(cont) {
+        println!("WARNING: page description to long or to shrot");
+        re = false;
     }
     //let mut trimmed = cont.replace("<image ", "`<image ");
     //trimmed = trimmed.replace(">", ">`");
     //trimmed = trimmed.replace("<meta ", "`<meta ");
-    true
+    re
 }
 
 fn main() {
@@ -44,6 +72,9 @@ fn main() {
             println!("HTML structure ok!");
             if check_seo(&trimmed) {
                 println!("SEO ok!");
+            }
+            else {
+                println!("SEO can be improved");
             }
         }
         else {
