@@ -1,6 +1,7 @@
 # EHTML
 
 EHTML is a html validator. (For now) It validates the basic structure (mening doctype, html, head, title and body tags in correct order) of an HTML file passed as an argument.
+It also validates some basic SEO good practices.
 
 ## Runing
 
@@ -8,7 +9,7 @@ EHTML is a html validator. (For now) It validates the basic structure (mening do
 
 ## ToDo
 - [x] Validate html structure (doctype, html, head, title, body) 
-- [ ] SEO tips (lenght of title and description, images format, alt and lazy load)
+- [x] SEO tips (lenght of title and description, images format, alt and lazy load)
 - [ ] css optimization
 - [ ] check for bad practices like the use of eval or innetHTML
 - [ ] compile jquery to js
