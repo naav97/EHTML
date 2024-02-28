@@ -4,6 +4,59 @@ use std::collections::HashMap;
 use std::env;
 use std::fs;
 
+fn proc_val(val: &str) -> String {
+    if val.contains("\"") { //|| val.contains("'")
+        let mut temp = val.to_string();
+        while true {
+            if temp.starts_with(" ") {
+                temp.remove(0);
+            }
+            else if temp.starts_with("\"") {
+                break;
+            }
+            else {
+                panic!("ERROR: bad format in string");
+            }
+        }
+        while true {
+            if temp.ends_with(" ") {
+                temp.remove(temp.len() - 1);
+            }
+            else if temp.ends_with("\"") {
+                break;
+            }
+            else {
+                panic!("ERROR: bad format in string");
+            }
+        }
+        return temp;
+    }
+    else {
+        return val.replace(" ", "").to_string();
+    }
+}
+
+fn proc_unty_var(def: &str, hmap: &mut HashMap<String, String>) {
+    let name = &def.split("=").collect::<Vec<&str>>()[0].replace(" ", "");
+    let vtype = "Any";
+    let val = &def.split("=").collect::<Vec<&str>>()[1].replace(">", "");
+    let trimval = proc_val(&val);
+    println!("name: {}, type: {}, val: {}", name, vtype, trimval);
+}
+
+fn proc_typed_var(def: &str, hmap: &mut HashMap<String, String>) {
+    let name = &def.split(":").collect::<Vec<&str>>()[0].replace(" ", "");
+    if def.contains("=") {
+        let vtype = &def.split(":").collect::<Vec<&str>>()[1].split("=").collect::<Vec<&str>>()[0].replace(" ", "");
+        let val = &def.split(":").collect::<Vec<&str>>()[1].split("=").collect::<Vec<&str>>()[1].replace(">", "");
+        let trimval = proc_val(&val);
+        println!("name: {}, type: {}, val: {}", name, vtype, trimval);
+    }
+    else {
+        panic!("ERROR: missing '=' in {}", def);
+    }
+}
+
 fn populate_vars(data: &str) -> HashMap<String, String> {
     let mut vars: HashMap<String, String> = HashMap::new();
     let data = &data.replace(">", ">`");
@@ -11,10 +64,19 @@ fn populate_vars(data: &str) -> HashMap<String, String> {
     let decl: Vec<&str> = data.split("`").collect();
     for dec in decl {
         if dec.starts_with("<let ") {
-            println!("{}", dec);
+            let def = dec.replace("<let ", "");
+            if def.contains(":") {
+                proc_typed_var(&def, &mut vars);
+            }
+            else if def.contains("=") {
+                proc_unty_var(&def, &mut vars);
+            }
+            else {
+                panic!("ERROR: invalid declaration: {} missing '=' or ':'", def);
+            }
         }
         else {
-            println!("ERROR: not a declaration ({})", dec);
+            panic!("ERROR: not a declaration ({})", dec);
         }
     }
     return vars;
