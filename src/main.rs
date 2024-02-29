@@ -3,6 +3,7 @@ mod seo;
 use std::collections::HashMap;
 use std::env;
 use std::fs;
+use regex::Regex;
 
 fn proc_val(val: &str) -> String {
     if val.contains("\"") { //|| val.contains("'")
@@ -12,6 +13,7 @@ fn proc_val(val: &str) -> String {
                 temp.remove(0);
             }
             else if temp.starts_with("\"") {
+                temp.remove(0);
                 break;
             }
             else {
@@ -23,6 +25,7 @@ fn proc_val(val: &str) -> String {
                 temp.remove(temp.len() - 1);
             }
             else if temp.ends_with("\"") {
+                temp.remove(temp.len() - 1);
                 break;
             }
             else {
@@ -38,10 +41,9 @@ fn proc_val(val: &str) -> String {
 
 fn proc_unty_var(def: &str, hmap: &mut HashMap<String, String>) {
     let name = &def.split("=").collect::<Vec<&str>>()[0].replace(" ", "");
-    let vtype = "Any";
     let val = &def.split("=").collect::<Vec<&str>>()[1].replace(">", "");
     let trimval = proc_val(&val);
-    println!("name: {}, type: {}, val: {}", name, vtype, trimval);
+    hmap.insert(name.to_string(), trimval);
 }
 
 fn proc_typed_var(def: &str, hmap: &mut HashMap<String, String>) {
@@ -50,7 +52,44 @@ fn proc_typed_var(def: &str, hmap: &mut HashMap<String, String>) {
         let vtype = &def.split(":").collect::<Vec<&str>>()[1].split("=").collect::<Vec<&str>>()[0].replace(" ", "");
         let val = &def.split(":").collect::<Vec<&str>>()[1].split("=").collect::<Vec<&str>>()[1].replace(">", "");
         let trimval = proc_val(&val);
-        println!("name: {}, type: {}, val: {}", name, vtype, trimval);
+        if vtype == "int" {
+            let regex = Regex::new(r"^-?\d+$").expect("type missmatch error");
+            if !regex.is_match(&trimval) {
+                panic!("ERROR: type missmatch expected int but got {}", trimval);
+            }
+            hmap.insert(name.to_string(), trimval);
+        }
+        else if vtype == "float" {
+            let regex = Regex::new(r"^-?\d+(\.\d+)?$").expect("type missmatch error");
+            if !regex.is_match(&trimval) {
+                panic!("ERROR: type missmatch expected float but got {}", trimval);
+            }
+            hmap.insert(name.to_string(), trimval);
+        }
+        else if vtype == "bool" {
+            let regex = Regex::new(r"^(true|false)$").expect("type missmatch error");
+            if !regex.is_match(&trimval) {
+                panic!("ERROR: type missmatch expected bool but got {}", trimval);
+            }
+            hmap.insert(name.to_string(), trimval);
+        }
+        else if vtype == "char" {
+            let regex = Regex::new(r"^.{1}$").expect("type missmatch error");
+            if !regex.is_match(&trimval) {
+                panic!("ERROR: type missmatch expected char but got {}", trimval);
+            }
+            hmap.insert(name.to_string(), trimval);
+        }
+        else if vtype == "str" {
+            let regex = Regex::new(r"^.+$").expect("type missmatch error");
+            if !regex.is_match(&trimval) {
+                panic!("ERROR: type missmatch expected str but got {}", trimval);
+            }
+            hmap.insert(name.to_string(), trimval);
+        }
+        else {
+            panic!("ERROR: unknown variable type {}", vtype);
+        }
     }
     else {
         panic!("ERROR: missing '=' in {}", def);
@@ -78,6 +117,9 @@ fn populate_vars(data: &str) -> HashMap<String, String> {
         else {
             panic!("ERROR: not a declaration ({})", dec);
         }
+    }
+    for (name, val) in &vars {
+        println!("{name}: {val}");
     }
     return vars;
 }
