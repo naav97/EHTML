@@ -124,6 +124,15 @@ fn populate_vars(data: &str) -> HashMap<String, String> {
     return vars;
 }
 
+fn replace_vars(dic: HashMap<String, String>, html: &str) {
+    for (i, c) in html.chars().enumerate() {
+        if c == '<' {
+            let tag_ini = &html[i..i+3];
+            println!("{}", tag_ini);
+        }
+    }
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() != 2 {
@@ -134,13 +143,16 @@ fn main() {
     let file_path = &args[1];
     if let Ok(html_content) = fs::read_to_string(file_path) {
         println!("HTML file read succesfull");
-        let mut trimmed = html_content.replace("\t", "");
-        trimmed = trimmed.replace("\n", "");
-        let parts: Vec<&str> = trimmed.split("<endvars/>").collect();
-        let vars = populate_vars(parts[0]);
-        if html::validate_html_structure(&parts[1]) {
+        let parts: Vec<&str> = html_content.split("<endvars/>").collect();
+        let mut trimmed_vars = parts[0].replace("\t", "");
+        trimmed_vars = trimmed_vars.replace("\n", "");
+        let mut trimmed_html = parts[1].replace("\t", "");
+        trimmed_html = trimmed_html.replace("\n", "");
+        let vars = populate_vars(&trimmed_vars);
+        replace_vars(vars, &parts[1]);
+        if html::validate_html_structure(&trimmed_html) {
             println!("HTML structure ok!");
-            if seo::check_seo(&parts[1]) {
+            if seo::check_seo(&trimmed_html) {
                 println!("SEO ok!");
             }
             else {
