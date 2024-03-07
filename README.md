@@ -1,12 +1,12 @@
 # EHTML
 
-EHTML is a html validator and minimalistic preprocesor. It validates the basic structure (mening doctype, html, head, title and body tags in correct order) of an HTML file passed as an argument.
-It also validates some basic SEO good practices.
+EHTML is an HTML validator and minimalistic preprocessor. It validates the basic structure (meaning doctype, html, head, title and body tags in correct order) of an HTML file passed as an argument.
+It also validates some basic SEO best practices.
 It has a simple template engine that can handle variables.
 
 ## Working with the engine
 
-to declare a varaible use the following sintax: 
+To declare a variable, use the following syntax: 
 
 `<let name(:type)?=val>`
 
@@ -21,15 +21,15 @@ The suppoerted types are:
 
 At the end of all the variable declarations and before the DOCTYPE tag there should be a `<endvars/>`, for example:
 
-`
+```
 <let name:str = "Pedro">
 ... other variable declarations ...
 <endvars/>
 <!DOCTYPE html>
 ...
-`
+```
 
-To insert a variable in the document use a pp tag like so:
+To insert a variable in the document, use a pp tag like this:
 
 `<pp name>`
 
